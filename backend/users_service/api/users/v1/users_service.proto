@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package users.v1;
+
+option go_package = "users_service/pkg/proto/users/v1";
+
+import "users/v1/create_user.proto";
+import "users/v1/authenticate_user.proto";
+
+service UsersServiceV1 {
+  rpc CreateUser(UserRegisterRequest) returns (UserRegisterResponse);
+  rpc AuthenticateUser(UserAuthenticateRequest) returns (UserAuthenticateResponse);
+}

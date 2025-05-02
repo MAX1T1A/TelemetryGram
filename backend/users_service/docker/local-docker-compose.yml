@@ -1,0 +1,45 @@
+name: usersservice_users_service
+
+services:
+  usersservice_service:
+    restart: unless-stopped
+    depends_on:
+      - usersservice_db
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    build:
+      context: ../
+      dockerfile: air.Dockerfile
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST=usersservice_db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME
+      - MAX_CONNECTIONS
+      - CONNECTION_IDLE_TIME_SEC
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB_NAME}?sslmode=disable
+      - GRPC_HOST
+      - GRPC_PORT
+      - GIN_MODE
+    volumes:
+      - ../pkg:/code/pkg
+      - ../cmd:/code/cmd
+      - ../docs:/code/docs
+      - ../internal:/code/internal
+
+  usersservice_db:
+    hostname: ${POSTGRES_DB_HOST}
+    command: [ "postgres", "-c", "max_prepared_transactions=1" ]
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_DB_LOGIN}
+      - POSTGRES_PASSWORD=${POSTGRES_DB_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_NAME}
+    ports:
+      - "${POSTGRES_DB_PORT}:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+      timeout: 2s
+      retries: 15
