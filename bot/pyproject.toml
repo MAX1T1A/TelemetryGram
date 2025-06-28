@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "telemetrygram-bot"
+version = "0.1.0"
+description = ""
+authors = ["MAX1T1A <max1t1aldan@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+watchfiles = "^1.0.5"
+telethon = "^1.40.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

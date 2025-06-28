@@ -1,0 +1,26 @@
+services:
+
+  telemetrygram_bot:
+    working_dir: /code/src
+    command: uvicorn --log-level debug app:app --host $APP_HOST --port $APP_PORT --reload
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    depends_on:
+      coreservice_db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST=coreservice_db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB_NAME}?sslmode=disable
+      - SQLALCHEMY_ECHO
+      - SQLALCHEMY_POOL_SIZE
+      - REDIS_URL=redis://coreservice_redis:6379/0
+      - LOGGING_LEVEL
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    volumes:
+      - ../src/app:/code/src/app
